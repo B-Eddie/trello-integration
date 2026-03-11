@@ -105,21 +105,5 @@
         },
       ];
     },
-
-    /* ── Board badge (shown in board header) ────────────────── */
-    "board-badges": function (t) {
-      return t
-        .get("board", "private", "lastSyncTime")
-        .then(function (lastSync) {
-          if (!lastSync) return [];
-          return [
-            {
-              text: "Last sync: " + new Date(lastSync).toLocaleDateString(),
-              icon: CALENDAR_ICON,
-              color: "blue",
-            },
-          ];
-        });
-    },
   });
 })();

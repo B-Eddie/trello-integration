@@ -104,7 +104,6 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
    - **Connector URL**: paste the URL from Step 2 (e.g. `https://…/index.html`)
 4. Under **Capabilities**, enable:
    - `board-buttons`
-   - `board-badges`
 5. Click **Save**.
 
 ---
