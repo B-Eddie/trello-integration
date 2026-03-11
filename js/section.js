@@ -90,22 +90,28 @@
   }
 
   /**
-   * Trigger a browser download of an .ics file.
-   * On macOS, downloaded .ics files are automatically opened by Calendar.app.
+   * Open a helper page (download.html) in a new, un-sandboxed tab.
+   * That page triggers the .ics download from a normal browsing context so
+   * macOS reliably opens the file in Calendar.app.
+   *
+   * Encoding: btoa(unescape(encodeURIComponent(icsContent))) handles UTF-8
+   * card names safely within a URL hash fragment.
    */
-  function downloadICS(icsContent, filename) {
-    var blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    // Small delay before revoking so the download has time to start
-    setTimeout(function () {
-      URL.revokeObjectURL(url);
-    }, 1000);
+  function downloadICS(icsContent) {
+    var encoded = btoa(unescape(encodeURIComponent(icsContent)));
+    var popup = window.open('./download.html#' + encoded, '_blank');
+    // Fallback: if the popup was blocked, try a direct download from the iframe
+    if (!popup || popup.closed) {
+      var blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'trello-event.ics';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
   }
 
   /**
@@ -193,8 +199,7 @@
         if (!card.due) return;
 
         var icsContent = buildICS(card);
-        var filename = safeFilename(card.name) + ".ics";
-        downloadICS(icsContent, filename);
+        downloadICS(icsContent);
 
         // Persist the export timestamp so badges update
         return t
