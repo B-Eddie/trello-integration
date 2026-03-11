@@ -3,7 +3,7 @@
 A Trello Power-Up that syncs cards with Apple Calendar.
 
 - One-time import: download `.ics` for the current card.
-- Auto-updating subscription: copy a stable card feed URL and subscribe in Apple Calendar so updates are pulled automatically.
+- Auto-updating subscription: copy one stable board feed URL and subscribe once in Apple Calendar so updates are pulled automatically.
 
 ---
 
@@ -12,7 +12,7 @@ A Trello Power-Up that syncs cards with Apple Calendar.
 1. Open a card with a due date.
 2. In **Apple Calendar Sync** section, either:
    - Click **Open in Apple Calendar** for a one-time `.ics` import.
-   - Click **Copy link** to copy the stable subscription URL.
+   - Click **Copy link** to copy the board subscription URL.
 3. In Apple Calendar, use **File → New Calendar Subscription...** and paste the copied URL.
 4. Apple Calendar will periodically re-fetch this URL and pull due-date changes automatically.
 
@@ -28,7 +28,8 @@ trello-integration/
 ├── sync.html       ← Board sync UI (popup window)
 ├── download.html   ← ICS file trigger & instructions
 ├── api/
-│   └── card-ics.js ← Live ICS endpoint for Apple Calendar subscriptions
+│   ├── ics.js      ← Live board ICS endpoint (one URL for all due cards)
+│   └── card-ics.js ← Live single-card ICS endpoint
 ├── js/
 │   └── client.js   ← Registers Power-Up capabilities
 ├── css/
@@ -58,7 +59,7 @@ If you want auto-updating subscription links, use **Vercel** and set environment
 - `TRELLO_API_KEY`
 - `TRELLO_API_TOKEN`
 
-These are used by `api/card-ics.js` to fetch live card data and generate ICS on demand.
+These are used by `api/ics.js` to fetch live board card data and generate ICS on demand.
 
 ---
 
@@ -139,7 +140,7 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 4. Click **Copy link**.
 5. In Apple Calendar: **File → New Calendar Subscription...** and paste the link.
 6. Save the subscription.
-7. Change the Trello card due date and wait for Apple Calendar refresh (or refresh manually) to confirm auto-update.
+7. Change any card due date on that board and wait for Apple Calendar refresh (or refresh manually) to confirm auto-update.
 
 ---
 

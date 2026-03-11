@@ -148,20 +148,24 @@
     el.classList.add("hidden");
   }
 
-  function buildSubscriptionUrl(cardId) {
+  function buildSubscriptionUrl(boardId) {
     return (
       window.location.origin +
-      "/api/card-ics?cardId=" +
-      encodeURIComponent(cardId)
+      "/api/ics?boardId=" +
+      encodeURIComponent(boardId)
     );
   }
 
   // ── Main logic ─────────────────────────────────────────────
   t.render(function () {
     return t
-      .card("id", "name", "due", "url")
+      .card("id", "name", "due", "url", "idBoard")
       .then(function (card) {
         hide(elLoading);
+
+        // One stable board-level URL that Apple Calendar can poll for updates.
+        elSubLink.value = buildSubscriptionUrl(card.idBoard);
+        hide(elCopyStatus);
 
         if (!card.due) {
           show(elNoDue);
@@ -183,10 +187,6 @@
 
         show(elHasDue);
         hide(elNoDue);
-
-        // Stable URL that Apple Calendar can poll for updates.
-        elSubLink.value = buildSubscriptionUrl(card.id);
-        hide(elCopyStatus);
 
         // Check if we've already exported this card
         return t
@@ -268,7 +268,7 @@
       .writeText(elSubLink.value)
       .then(function () {
         elCopyStatus.textContent =
-          "Copied. In Apple Calendar: File -> New Calendar Subscription -> paste this URL.";
+          "Copied. In Apple Calendar: File -> New Calendar Subscription -> paste this URL once.";
         show(elCopyStatus);
         t.sizeTo("#app").catch(function () {});
       })
