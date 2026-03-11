@@ -89,7 +89,6 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-
     /* ── Card-detail badge (card back header) — clickable ────────── */
     "card-detail-badges": function (t) {
       return t.card("id", "name", "due", "shortUrl").then(function (card) {
@@ -111,7 +110,7 @@
                 "card",
                 "private",
                 "calendarLastAdded",
-                new Date().toISOString()
+                new Date().toISOString(),
               );
             },
           },
