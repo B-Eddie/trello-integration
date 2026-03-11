@@ -6,6 +6,14 @@
 (function () {
   "use strict";
 
+  // Resolve an absolute URL for any page in this Power-Up.
+  // Using absolute URLs with t.signUrl() is required — relative URLs are not
+  // reliably resolved by the Trello SDK in all browser/iframe contexts.
+  var BASE_URL = window.location.href.replace(/\/[^/]*$/, '/');
+  function absUrl(page) {
+    return BASE_URL + page;
+  }
+
   // Small calendar SVG used as the section icon (data URI)
   var CALENDAR_ICON =
     "data:image/svg+xml;utf8," +
@@ -27,9 +35,9 @@
         icon: CALENDAR_ICON,
         content: {
           type: "iframe",
-          // t.signUrl appends the Trello context JWT so section.js can
-          // call t.card() inside the iframe.
-          url: t.signUrl("./section.html"),
+          // t.signUrl MUST receive an absolute URL so the JWT hash is
+          // correctly embedded and TrelloPowerUp.iframe() can parse it.
+          url: t.signUrl(absUrl('section.html')),
           height: 88,
         },
       };
