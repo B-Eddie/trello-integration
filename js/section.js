@@ -158,13 +158,20 @@
 
   // ── Main logic ─────────────────────────────────────────────
   t.render(function () {
+    var context = t.getContext() || {};
+    var boardId = context.board || context.idBoard || "";
+
     return t
-      .card("id", "name", "due", "url", "idBoard")
+      .card("id", "name", "due", "url")
       .then(function (card) {
         hide(elLoading);
 
         // One stable board-level URL that Apple Calendar can poll for updates.
-        elSubLink.value = buildSubscriptionUrl(card.idBoard);
+        if (boardId) {
+          elSubLink.value = buildSubscriptionUrl(boardId);
+        } else {
+          elSubLink.value = "";
+        }
         hide(elCopyStatus);
 
         if (!card.due) {
