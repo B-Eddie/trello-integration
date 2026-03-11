@@ -65,6 +65,7 @@
     var dueDate = new Date(card.due);
     var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000); // +1 hour
     var now = new Date();
+    var cardUrl = card.url || "";
 
     var lines = [
       "BEGIN:VCALENDAR",
@@ -78,8 +79,8 @@
       "DTSTART:" + toICSDate(dueDate),
       "DTEND:" + toICSDate(endDate),
       foldLine("SUMMARY:" + escapeICS(card.name)),
-      foldLine("DESCRIPTION:" + escapeICS("Trello card: " + card.shortUrl)),
-      foldLine("URL:" + card.shortUrl),
+      foldLine("DESCRIPTION:" + escapeICS("Trello card: " + cardUrl)),
+      foldLine("URL:" + cardUrl),
       "SEQUENCE:0",
       "LAST-MODIFIED:" + toICSDate(now),
       "END:VEVENT",
@@ -148,7 +149,7 @@
   // ── Main logic ─────────────────────────────────────────────
   t.render(function () {
     return t
-      .card("id", "name", "due", "shortUrl")
+      .card("id", "name", "due", "url")
       .then(function (card) {
         hide(elLoading);
 
@@ -205,7 +206,7 @@
 
   // ── Button handler (exposed globally for the inline onclick) ─
   window.addToCalendar = function () {
-    t.card("id", "name", "due", "shortUrl")
+    t.card("id", "name", "due", "url")
       .then(function (card) {
         if (!card.due) return;
 

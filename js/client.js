@@ -61,6 +61,7 @@
     var dueDate = new Date(card.due);
     var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000);
     var now = new Date();
+    var cardUrl = card.url || "";
     return [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -73,8 +74,8 @@
       "DTSTART:" + toICSDate(dueDate),
       "DTEND:" + toICSDate(endDate),
       foldLine("SUMMARY:" + escapeICS(card.name)),
-      foldLine("DESCRIPTION:" + escapeICS("Trello card: " + card.shortUrl)),
-      foldLine("URL:" + card.shortUrl),
+      foldLine("DESCRIPTION:" + escapeICS("Trello card: " + cardUrl)),
+      foldLine("URL:" + cardUrl),
       "SEQUENCE:0",
       "LAST-MODIFIED:" + toICSDate(now),
       "END:VEVENT",
@@ -83,7 +84,7 @@
   }
 
   function openCardInCalendar(t) {
-    return t.card("id", "name", "due", "shortUrl").then(function (card) {
+    return t.card("id", "name", "due", "url").then(function (card) {
       if (!card.due) {
         return t.alert({
           message: "Add a due date first, then sync to Apple Calendar.",
