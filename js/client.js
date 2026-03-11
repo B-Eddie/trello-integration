@@ -109,15 +109,18 @@
                     if (!currentCard.due) return;
                     var icsContent = buildICS(currentCard);
                     var encoded = btoa(
-                      unescape(encodeURIComponent(icsContent))
+                      unescape(encodeURIComponent(icsContent)),
                     );
-                    window.open(BASE_URL + "download.html#" + encoded, "_blank");
+                    window.open(
+                      BASE_URL + "download.html#" + encoded,
+                      "_blank",
+                    );
                     // Record sync time
                     return t.set(
                       "card",
                       "private",
                       "calendarLastAdded",
-                      new Date().toISOString()
+                      new Date().toISOString(),
                     );
                   });
               },
