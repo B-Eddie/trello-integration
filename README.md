@@ -130,10 +130,10 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---|---|
-| Section doesn't appear | Make sure the card has a due date set. Reload the board. |
-| "This site can't be reached" | The Power-Up URL must be HTTPS. Use GitHub Pages or Netlify. |
+| Problem                              | Fix                                                                           |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| Section doesn't appear               | Make sure the card has a due date set. Reload the board.                      |
+| "This site can't be reached"         | The Power-Up URL must be HTTPS. Use GitHub Pages or Netlify.                  |
 | Calendar doesn't open after download | Check your Downloads folder for the `.ics` file and double-click it manually. |
-| Badge doesn't update | Reload the page — Trello caches badges for a few seconds. |
-| Duplicate events in Calendar | Delete the old event; re-importing will update via matching UID. |
+| Badge doesn't update                 | Reload the page — Trello caches badges for a few seconds.                     |
+| Duplicate events in Calendar         | Delete the old event; re-importing will update via matching UID.              |
