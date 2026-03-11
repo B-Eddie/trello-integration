@@ -7,12 +7,12 @@ A Trello Power-Up that syncs cards with Apple Calendar. When a Trello card has a
 ## How it works
 
 1. Open any Trello card that has a due date.
-2. Scroll to the **Apple Calendar** section in the card back.
-3. Click **"Add to Apple Calendar"**.
-4. macOS downloads the `.ics` file and Calendar.app opens it, prompting you to add the event.
-5. A green badge ("In Calendar") appears on the card to remind you it has been exported.
+2. A green **"Sync to Calendar"** badge appears at the top of the card (under the title).
+3. Click the badge → a new tab opens with your `.ics` file.
+4. macOS downloads the file and Calendar.app opens it, prompting you to add the event.
+5. Done — the event is now in your Apple Calendar.
 
-Re-exporting the same card (e.g. after a due-date change) updates the existing Calendar event because the `.ics` UID is derived from the Trello card ID.
+Re-exporting the same card (e.g. after a due-date change) updates the existing Calendar event because the `.ics` UID is tied to the Trello card ID.
 
 ---
 

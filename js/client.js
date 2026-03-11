@@ -89,53 +89,34 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-    /* ── Sidebar button on the card back ─────────────────────── */
-    "card-buttons": function (t) {
-      return [
-        {
-          icon: CALENDAR_ICON,
-          text: "→ Apple Calendar",
-          callback: function () {
-            t.card("id", "name", "due", "shortUrl")
-              .then(function (card) {
-                if (!card.due) {
-                  alert("This card has no due date. Add one first, then try again.");
-                  return;
-                }
-                var icsContent = buildICS(card);
-                var encoded = btoa(unescape(encodeURIComponent(icsContent)));
-                window.open(BASE_URL + "download.html#" + encoded, "_blank");
-                t.set("card", "private", "calendarLastAdded", new Date().toISOString());
-              })
-              .catch(function (err) {
-                console.error("Error:", err);
-                alert("Error: " + err.message);
-              });
-          },
-        },
-      ];
-    },
 
-    /* ── Card-detail badge (card back header) ─────────────────── */
+    /* ── Card-detail badge (card back header) — clickable ────────── */
     "card-detail-badges": function (t) {
-      return t
-        .get("card", "private", "calendarLastAdded")
-        .then(function (lastAdded) {
-          if (!lastAdded) return [];
-          var when = new Date(lastAdded);
-          return [
-            {
-              text:
-                "Added to Calendar " +
-                when.toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                }),
-              icon: CALENDAR_ICON,
-              color: "green",
+      return t.card("id", "name", "due", "shortUrl").then(function (card) {
+        if (!card.due) return [];
+
+        // Show a green "Open Calendar" badge that's clickable
+        return [
+          {
+            text: "Sync to Calendar",
+            icon: CALENDAR_ICON,
+            color: "green",
+            callback: function () {
+              // When badge is clicked, generate ICS and open download
+              var icsContent = buildICS(card);
+              var encoded = btoa(unescape(encodeURIComponent(icsContent)));
+              window.open(BASE_URL + "download.html#" + encoded, "_blank");
+              // Record sync time
+              t.set(
+                "card",
+                "private",
+                "calendarLastAdded",
+                new Date().toISOString()
+              );
             },
-          ];
-        });
+          },
+        ];
+      });
     },
 
     /* ── Card badge (compact, shown on the board) ─────────────── */
