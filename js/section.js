@@ -19,6 +19,8 @@
   var elAddBtn = document.getElementById("btn-add");
   var elAddedBadge = document.getElementById("added-badge");
   var elLastText = document.getElementById("last-added-text");
+  var elSubLink = document.getElementById("sub-link");
+  var elCopyStatus = document.getElementById("copy-status");
 
   // ── Helpers ────────────────────────────────────────────────
 
@@ -146,6 +148,14 @@
     el.classList.add("hidden");
   }
 
+  function buildSubscriptionUrl(cardId) {
+    return (
+      window.location.origin +
+      "/api/card-ics?cardId=" +
+      encodeURIComponent(cardId)
+    );
+  }
+
   // ── Main logic ─────────────────────────────────────────────
   t.render(function () {
     return t
@@ -173,6 +183,10 @@
 
         show(elHasDue);
         hide(elNoDue);
+
+        // Stable URL that Apple Calendar can poll for updates.
+        elSubLink.value = buildSubscriptionUrl(card.id);
+        hide(elCopyStatus);
 
         // Check if we've already exported this card
         return t
@@ -245,6 +259,24 @@
           "[Apple Calendar Power-Up] Error adding to calendar:",
           err,
         );
+      });
+  };
+
+  window.copySubLink = function () {
+    if (!elSubLink.value) return;
+    navigator.clipboard
+      .writeText(elSubLink.value)
+      .then(function () {
+        elCopyStatus.textContent =
+          "Copied. In Apple Calendar: File -> New Calendar Subscription -> paste this URL.";
+        show(elCopyStatus);
+        t.sizeTo("#app").catch(function () {});
+      })
+      .catch(function () {
+        elSubLink.select();
+        document.execCommand("copy");
+        elCopyStatus.textContent = "Copied.";
+        show(elCopyStatus);
       });
   };
 })();

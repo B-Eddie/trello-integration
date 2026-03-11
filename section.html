@@ -71,6 +71,17 @@
           </span>
         </div>
 
+        <div class="sub-link-wrap">
+          <label for="sub-link" class="muted small">Auto-update subscription URL (use in Apple Calendar)</label>
+          <div class="sub-link-row">
+            <input id="sub-link" class="sub-link" type="text" readonly />
+            <button id="btn-copy-link" class="btn btn-secondary" onclick="copySubLink()">
+              Copy link
+            </button>
+          </div>
+          <p id="copy-status" class="muted small hidden"></p>
+        </div>
+
         <p id="last-added-text" class="muted small hidden"></p>
       </div>
 
