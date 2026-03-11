@@ -2,21 +2,16 @@
 
 A Trello Power-Up that syncs cards with Apple Calendar.
 
-- One-time import: download `.ics` for the current card.
-- Auto-updating subscription: copy one stable board feed URL and subscribe once in Apple Calendar so updates are pulled automatically.
+- Auto-updating subscription: one stable board feed URL and subscribe once in Apple Calendar so updates are pulled automatically.
 
 ---
 
 ## How it works
 
 1. Open a card with a due date.
-2. In **Apple Calendar Sync** section, either:
-   - Click **Open in Apple Calendar** for a one-time `.ics` import.
-   - Click **Copy link** to copy the board subscription URL.
-3. In Apple Calendar, use **File → New Calendar Subscription...** and paste the copied URL.
+2. In **Apple Calendar Sync** section, click the single feed link.
+3. In Apple Calendar, use **File → New Calendar Subscription...** and paste that URL.
 4. Apple Calendar will periodically re-fetch this URL and pull due-date changes automatically.
-
-Re-exporting the same card (e.g. after a due-date change) updates the existing Calendar event because the `.ics` UID is tied to the Trello card ID.
 
 ---
 
@@ -25,8 +20,6 @@ Re-exporting the same card (e.g. after a due-date change) updates the existing C
 ```
 trello-integration/
 ├── index.html      ← Power-Up connector (Trello's entry point)
-├── sync.html       ← Board sync UI (popup window)
-├── download.html   ← ICS file trigger & instructions
 ├── api/
 │   ├── ics.js      ← Live board ICS endpoint (one URL for all due cards)
 │   └── card-ics.js ← Live single-card ICS endpoint
@@ -137,7 +130,7 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 1. Open any card and add a due date.
 2. Add any attachment to the card (a link or file).
 3. Reopen the card and look above the attachments area for **Apple Calendar Sync** section.
-4. Click **Copy link**.
+4. Copy the displayed feed URL.
 5. In Apple Calendar: **File → New Calendar Subscription...** and paste the link.
 6. Save the subscription.
 7. Change any card due date on that board and wait for Apple Calendar refresh (or refresh manually) to confirm auto-update.
@@ -146,14 +139,12 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 ## Troubleshooting
 
-| Problem                             | Fix                                                                                  |
-| ----------------------------------- | ------------------------------------------------------------------------------------ |
-| No Apple Calendar section on card   | Make sure `attachment-sections` is enabled and the card has at least one attachment. |
-| No card sidebar sync button         | Make sure `card-buttons` capability is enabled in Power-Up settings.                 |
-| No board-level sync button          | Make sure `board-buttons` capability is enabled in Power-Up settings.                |
-| "This site can't be reached"        | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel.                |
-| Popup doesn't open                  | Check if your browser is blocking popups. Allow popups for Trello.                   |
-| .ics file doesn't open Calendar.app | Double-click the `.ics` file in Downloads manually.                                  |
-| No cards appear in the sync popup   | Make sure cards on the board have due dates set.                                     |
-| Duplicate events in Calendar        | Delete the old event; re-syncing will update the Calendar event via matching UID.    |
-| Subscription URL returns error      | Set `TRELLO_API_KEY` and `TRELLO_API_TOKEN` in Vercel project settings and redeploy. |
+| Problem                           | Fix                                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| No Apple Calendar section on card | Make sure `attachment-sections` is enabled and the card has at least one attachment. |
+| No card sidebar sync button       | Make sure `card-buttons` capability is enabled in Power-Up settings.                 |
+| No board-level sync button        | Make sure `board-buttons` capability is enabled in Power-Up settings.                |
+| "This site can't be reached"      | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel.                |
+| Feed link does not open           | Ensure your Power-Up is hosted over HTTPS and reachable from Trello.                 |
+| Duplicate events in Calendar      | Delete the old event; re-syncing will update the Calendar event via matching UID.    |
+| Subscription URL returns error    | Set `TRELLO_API_KEY` and `TRELLO_API_TOKEN` in Vercel project settings and redeploy. |

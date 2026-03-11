@@ -34,10 +34,11 @@
         </div>
 
         <div class="actions">
-          <button
-            id="btn-add"
+          <a
+            id="calendar-feed-link"
             class="btn btn-primary"
-            onclick="addToCalendar()"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <svg
               class="btn-icon"
@@ -53,36 +54,22 @@
               <polyline points="15 3 21 3 21 9" />
               <line x1="10" y1="14" x2="21" y2="3" />
             </svg>
-            Open in Apple Calendar
-          </button>
-
-          <span id="added-badge" class="badge badge-green hidden">
-            <svg
-              class="btn-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Added — check your Calendar app
-          </span>
+            Open Auto-Updating Calendar Feed
+          </a>
         </div>
 
         <div class="sub-link-wrap">
-          <label for="sub-link" class="muted small">Board subscription URL (auto-updates when card due dates change)</label>
-          <div class="sub-link-row">
-            <input id="sub-link" class="sub-link" type="text" readonly />
-            <button id="btn-copy-link" class="btn btn-secondary" onclick="copySubLink()">
-              Copy link
-            </button>
-          </div>
-          <p id="copy-status" class="muted small hidden"></p>
+          <p class="muted small">
+            Subscribe in Apple Calendar using this URL. It updates automatically
+            when due dates change or new due dates are added.
+          </p>
+          <a
+            id="sub-link"
+            class="sub-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          ></a>
         </div>
-
-        <p id="last-added-text" class="muted small hidden"></p>
       </div>
 
       <div id="loading" class="state">

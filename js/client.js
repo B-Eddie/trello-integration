@@ -31,78 +31,23 @@
   };
   var ATTACHMENT_SECTION_ICON = BASE_URL + "img/icon-dark.svg";
 
-  // ── ICS helpers ──────────────────────────────────────────────
-  function toICSDate(date) {
-    return date
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .replace(/\.\d{3}/, "");
+  function buildBoardFeedUrl(boardId) {
+    return BASE_URL + "api/ics?boardId=" + encodeURIComponent(boardId);
   }
 
-  function escapeICS(str) {
-    return String(str)
-      .replace(/\\/g, "\\\\")
-      .replace(/;/g, "\\;")
-      .replace(/,/g, "\\,")
-      .replace(/\n/g, "\\n");
-  }
+  function openBoardFeed(t) {
+    var context = t.getContext() || {};
+    var boardId = context.board || context.idBoard || "";
 
-  function foldLine(line) {
-    if (line.length <= 75) return line;
-    var result = "";
-    while (line.length > 75) {
-      result += line.slice(0, 75) + "\r\n ";
-      line = line.slice(75);
+    if (!boardId) {
+      return t.alert({
+        message: "Could not resolve board ID for calendar feed.",
+        duration: 8,
+      });
     }
-    return result + line;
-  }
 
-  function buildICS(card) {
-    var dueDate = new Date(card.due);
-    var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000);
-    var now = new Date();
-    var cardUrl = card.url || "";
-    return [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Trello Apple Calendar Power-Up//EN",
-      "CALSCALE:GREGORIAN",
-      "METHOD:PUBLISH",
-      "BEGIN:VEVENT",
-      "UID:" + card.id + "@trello-apple-calendar-powerup",
-      "DTSTAMP:" + toICSDate(now),
-      "DTSTART:" + toICSDate(dueDate),
-      "DTEND:" + toICSDate(endDate),
-      foldLine("SUMMARY:" + escapeICS(card.name)),
-      foldLine("DESCRIPTION:" + escapeICS("Trello card: " + cardUrl)),
-      foldLine("URL:" + cardUrl),
-      "SEQUENCE:0",
-      "LAST-MODIFIED:" + toICSDate(now),
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-  }
-
-  function openCardInCalendar(t) {
-    return t.card("id", "name", "due").then(function (card) {
-      if (!card.due) {
-        return t.alert({
-          message: "Add a due date first, then sync to Apple Calendar.",
-          duration: 6,
-        });
-      }
-
-      var icsContent = buildICS(card);
-      var encoded = btoa(unescape(encodeURIComponent(icsContent)));
-      window.open(BASE_URL + "download.html#" + encoded, "_blank");
-
-      return t.set(
-        "card",
-        "private",
-        "calendarLastAdded",
-        new Date().toISOString(),
-      );
-    });
+    window.open(buildBoardFeedUrl(boardId), "_blank");
+    return Promise.resolve();
   }
 
   // ── Power-Up registration ─────────────────────────────────────
@@ -118,13 +63,7 @@
             condition: "always",
             callback: function (t) {
               console.log("[Power-Up] button clicked");
-              // Pass the board context to sync.html via window.open
-              window.trelloPowerUpContext = t;
-              window.open(
-                BASE_URL + "sync.html",
-                "sync",
-                "width=700,height=600",
-              );
+              return openBoardFeed(t);
             },
           },
         ];
@@ -169,9 +108,9 @@
       return [
         {
           icon: BASE_URL + "img/icon-dark.svg",
-          text: "Sync this card to Apple Calendar",
+          text: "Open board calendar feed",
           callback: function (t) {
-            return openCardInCalendar(t);
+            return openBoardFeed(t);
           },
         },
       ];
