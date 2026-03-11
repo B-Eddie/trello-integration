@@ -101,7 +101,11 @@
               console.log("[Power-Up] button clicked");
               // Pass the board context to sync.html via window.open
               window.trelloPowerUpContext = t;
-              window.open(BASE_URL + "sync.html", "sync", "width=700,height=600");
+              window.open(
+                BASE_URL + "sync.html",
+                "sync",
+                "width=700,height=600",
+              );
             },
           },
         ];
