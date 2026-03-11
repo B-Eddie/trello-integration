@@ -91,31 +91,43 @@
   TrelloPowerUp.initialize({
     /* ── Card-detail badge (card back header) — clickable ────────── */
     "card-detail-badges": function (t) {
-      return t.card("id", "name", "due", "shortUrl").then(function (card) {
-        if (!card.due) return [];
-
-        // Show a green "Open Calendar" badge that's clickable
-        return [
-          {
-            text: "Sync to Calendar",
-            icon: CALENDAR_ICON,
-            color: "green",
-            callback: function () {
-              // When badge is clicked, generate ICS and open download
-              var icsContent = buildICS(card);
-              var encoded = btoa(unescape(encodeURIComponent(icsContent)));
-              window.open(BASE_URL + "download.html#" + encoded, "_blank");
-              // Record sync time
-              t.set(
-                "card",
-                "private",
-                "calendarLastAdded",
-                new Date().toISOString(),
-              );
+      return t
+        .card("due")
+        .then(function (card) {
+          if (!card.due) return [];
+          // Show clickable badge — data will be fetched fresh in the callback
+          return [
+            {
+              text: "→ Calendar",
+              icon: CALENDAR_ICON,
+              color: "green",
+              callback: function (t) {
+                // Fetch fresh card data when badge is clicked
+                return t
+                  .card("id", "name", "due", "shortUrl")
+                  .then(function (currentCard) {
+                    if (!currentCard.due) return;
+                    var icsContent = buildICS(currentCard);
+                    var encoded = btoa(
+                      unescape(encodeURIComponent(icsContent))
+                    );
+                    window.open(BASE_URL + "download.html#" + encoded, "_blank");
+                    // Record sync time
+                    return t.set(
+                      "card",
+                      "private",
+                      "calendarLastAdded",
+                      new Date().toISOString()
+                    );
+                  });
+              },
             },
-          },
-        ];
-      });
+          ];
+        })
+        .catch(function (err) {
+          console.error("card-detail-badges error:", err);
+          return [];
+        });
     },
 
     /* ── Card badge (compact, shown on the board) ─────────────── */
