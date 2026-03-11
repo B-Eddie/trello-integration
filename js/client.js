@@ -20,7 +20,7 @@
   // Trello's JWT hash appended to index.html doesn't corrupt the path.
   var BASE_URL = (window.location.origin + window.location.pathname).replace(
     /\/[^/]*$/,
-    "/"
+    "/",
   );
 
   // ── Calendar icon ────────────────────────────────────────────
@@ -33,12 +33,15 @@
         '<line x1="16" y1="2" x2="16" y2="6"/>' +
         '<line x1="8" y1="2" x2="8" y2="6"/>' +
         '<line x1="3" y1="10" x2="21" y2="10"/>' +
-        "</svg>"
+        "</svg>",
     );
 
   // ── ICS helpers ──────────────────────────────────────────────
   function toICSDate(date) {
-    return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    return date
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
   }
 
   function escapeICS(str) {
@@ -86,7 +89,6 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-
     /* ── Sidebar button on the card back ─────────────────────── */
     "card-buttons": function (t) {
       return t.card("due").then(function (card) {
@@ -116,7 +118,7 @@
                     "card",
                     "private",
                     "calendarLastAdded",
-                    new Date().toISOString()
+                    new Date().toISOString(),
                   );
                 });
             },
