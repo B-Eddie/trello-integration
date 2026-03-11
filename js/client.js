@@ -29,7 +29,7 @@
     dark: BASE_URL + "img/icon-light.svg",
     light: BASE_URL + "img/icon-dark.svg",
   };
-  var ATTACHMENT_SECTION_ICON = BASE_URL + "img/icon-dark.svg";
+  var SECTION_ICON = BASE_URL + "img/icon-dark.svg";
 
   function buildBoardFeedUrl(boardId) {
     return BASE_URL + "api/ics?boardId=" + encodeURIComponent(boardId);
@@ -52,17 +52,21 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-    /* ── Card back section (always available on card back) ───── */
+    /* ── Card back section (shown when card has a due date) ───── */
     "card-back-section": function (t) {
-      return {
-        title: "Apple Calendar Sync",
-        icon: ATTACHMENT_SECTION_ICON,
-        content: {
-          type: "iframe",
-          url: t.signUrl(BASE_URL + "section.html"),
-          height: 120,
-        },
-      };
+      return t.card("due").then(function (card) {
+        if (!card.due) return null;
+
+        return {
+          title: "Apple Calendar Sync",
+          icon: SECTION_ICON,
+          content: {
+            type: "iframe",
+            url: t.signUrl(BASE_URL + "section.html"),
+            height: 120,
+          },
+        };
+      });
     },
 
     /* ── Board button (top of board) ──────────────────────────── */
@@ -84,36 +88,6 @@
         console.error("[Power-Up] Error in board-buttons:", err);
         return [];
       }
-    },
-
-    /* ── Attachment section (shown above card attachments) ───── */
-    "attachment-sections": function (t, options) {
-      var entries = (options && options.entries) || [];
-
-      // Attachment sections must claim at least one attachment entry.
-      // We claim all URL attachments so the section appears reliably on
-      // cards that contain attachments.
-      var claimed = entries.filter(function (entry) {
-        return entry && entry.url;
-      });
-
-      if (!claimed.length) {
-        return [];
-      }
-
-      return [
-        {
-          id: "apple-calendar-sync",
-          claimed: claimed,
-          icon: ATTACHMENT_SECTION_ICON,
-          title: "Apple Calendar Sync",
-          content: {
-            type: "iframe",
-            url: t.signUrl(BASE_URL + "section.html"),
-            height: 120,
-          },
-        },
-      ];
     },
 
     /* ── Card sidebar button (reliable fallback) ─────────────── */

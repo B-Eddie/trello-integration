@@ -38,6 +38,9 @@ function buildCalendar(cards) {
     "PRODID:-//Trello Apple Calendar Power-Up//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
+    "REFRESH-INTERVAL;VALUE=DURATION:PT5M",
+    "X-PUBLISHED-TTL:PT5M",
+    "X-WR-CALNAME:Trello Due Dates",
   ];
 
   cards.forEach(function (card) {
@@ -46,6 +49,8 @@ function buildCalendar(cards) {
     var dueDate = new Date(card.due);
     var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000);
     var cardUrl = card.url || "";
+    var activityDate = new Date(card.dateLastActivity || now);
+    var sequence = Math.max(1, Math.floor(activityDate.getTime() / 1000));
 
     lines.push(
       "BEGIN:VEVENT",
@@ -56,8 +61,9 @@ function buildCalendar(cards) {
       foldLine("SUMMARY:" + escapeICS(card.name)),
       foldLine("DESCRIPTION:" + escapeICS("Trello card: " + cardUrl)),
       foldLine("URL:" + cardUrl),
-      "SEQUENCE:0",
-      "LAST-MODIFIED:" + toICSDate(new Date(card.dateLastActivity || now)),
+      "SEQUENCE:" + sequence,
+      "LAST-MODIFIED:" + toICSDate(activityDate),
+      card.closed ? "STATUS:CANCELLED" : "STATUS:CONFIRMED",
       "END:VEVENT",
     );
   });
@@ -68,6 +74,7 @@ function buildCalendar(cards) {
 
 module.exports = async function handler(req, res) {
   try {
+    var forceRefresh = !!req.query.refresh;
     var boardId = req.query.boardId || cleanEnv(process.env.TRELLO_BOARD_ID);
     if (!boardId) {
       res
@@ -92,11 +99,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    var fields = "id,name,due,url,dateLastActivity";
+    var fields = "id,name,due,url,dateLastActivity,closed";
     var endpoint =
       "https://api.trello.com/1/boards/" +
       encodeURIComponent(boardId) +
-      "/cards?filter=open&fields=" +
+      "/cards?filter=all&fields=" +
       encodeURIComponent(fields) +
       "&key=" +
       encodeURIComponent(key) +
@@ -128,20 +135,46 @@ module.exports = async function handler(req, res) {
       return Math.max(maxTs, ts);
     }, 0);
 
+    var closedDueCount = dueCards.filter(function (card) {
+      return !!card.closed;
+    }).length;
+
+    var etagSeed = dueCards
+      .map(function (card) {
+        return [
+          card.id,
+          card.closed ? "1" : "0",
+          card.due || "",
+          card.dateLastActivity || "",
+        ].join(":");
+      })
+      .sort()
+      .join("|");
+
     var etag =
-      'W/"' + boardId + "-" + dueCards.length + "-" + maxActivity + '"';
-    if (req.headers["if-none-match"] === etag) {
+      'W/"' +
+      boardId +
+      "-" +
+      dueCards.length +
+      "-" +
+      closedDueCount +
+      "-" +
+      maxActivity +
+      "-" +
+      etagSeed.length +
+      '"';
+    if (!forceRefresh && req.headers["if-none-match"] === etag) {
       res.status(304).end();
       return;
     }
 
     var ics = buildCalendar(dueCards);
     res.setHeader("Content-Type", "text/calendar; charset=utf-8");
-    res.setHeader(
-      "Cache-Control",
-      "public, max-age=300, stale-while-revalidate=300",
-    );
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     res.setHeader("ETag", etag);
+    res.setHeader("X-Generated-At", new Date().toISOString());
     res.status(200).send(ics);
   } catch (err) {
     res.status(500).send("Server error: " + err.message);
