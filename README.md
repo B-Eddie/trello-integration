@@ -103,6 +103,8 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
    - **Workspace**: choose your workspace
    - **Connector URL**: paste the URL from Step 2 (e.g. `https://…/index.html`)
 4. Under **Capabilities**, enable:
+   - `attachment-sections`
+   - `card-buttons`
    - `board-buttons`
 5. Click **Save**.
 
@@ -119,11 +121,11 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 ### Step 5 — Test it
 
-1. Refresh the board — you should see **"Sync to Apple Calendar"** button at the top in the board header.
-2. Click the button → a popup opens showing all cards with due dates.
-3. Select the cards you want to sync (or **Select All**).
-4. Click **"Sync Selected to Calendar"** → .ics files download.
-5. In your Downloads folder, double-click each `.ics` file → Calendar.app prompts you to add the event. Click **OK**.
+1. Open any card and add a due date.
+2. Add any attachment to the card (a link or file).
+3. Reopen the card and look above the attachments area for **Apple Calendar Sync** section.
+4. Click **Open in Apple Calendar** in that section.
+5. In your Downloads folder, open the `.ics` file and confirm in Calendar.app.
 
 ---
 
@@ -131,7 +133,9 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 | Problem                             | Fix                                                                                     |
 | ----------------------------------- | --------------------------------------------------------------------------------------- |
-| No "Sync to Apple Calendar" button  | Make sure `board-buttons` capability is enabled in Power-Up settings. Reload the board. |
+| No Apple Calendar section on card   | Make sure `attachment-sections` is enabled and the card has at least one attachment. |
+| No card sidebar sync button         | Make sure `card-buttons` capability is enabled in Power-Up settings. |
+| No board-level sync button          | Make sure `board-buttons` capability is enabled in Power-Up settings. |
 | "This site can't be reached"        | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel.                   |
 | Popup doesn't open                  | Check if your browser is blocking popups. Allow popups for Trello.                      |
 | .ics file doesn't open Calendar.app | Double-click the `.ics` file in Downloads manually.                                     |
