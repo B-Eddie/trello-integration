@@ -23,18 +23,12 @@
     "/",
   );
 
-  // ── Calendar icon ────────────────────────────────────────────
-  var CALENDAR_ICON =
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
-        'fill="none" stroke="%23555" stroke-width="2">' +
-        '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>' +
-        '<line x1="16" y1="2" x2="16" y2="6"/>' +
-        '<line x1="8" y1="2" x2="8" y2="6"/>' +
-        '<line x1="3" y1="10" x2="21" y2="10"/>' +
-        "</svg>",
-    );
+  // Trello board-buttons expects an icon object with variants for
+  // light and dark board backgrounds.
+  var CALENDAR_ICON = {
+    dark: BASE_URL + "img/icon-light.svg",
+    light: BASE_URL + "img/icon-dark.svg",
+  };
 
   // ── ICS helpers ──────────────────────────────────────────────
   function toICSDate(date) {
@@ -97,7 +91,8 @@
           {
             icon: CALENDAR_ICON,
             text: "Sync to Apple Calendar",
-            callback: function () {
+            condition: "always",
+            callback: function (t) {
               console.log("[Power-Up] button clicked");
               // Pass the board context to sync.html via window.open
               window.trelloPowerUpContext = t;
