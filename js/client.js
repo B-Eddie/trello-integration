@@ -81,6 +81,28 @@
     ].join("\r\n");
   }
 
+  function openCardInCalendar(t) {
+    return t.card("id", "name", "due", "shortUrl").then(function (card) {
+      if (!card.due) {
+        return t.alert({
+          message: "Add a due date first, then sync to Apple Calendar.",
+          duration: 6,
+        });
+      }
+
+      var icsContent = buildICS(card);
+      var encoded = btoa(unescape(encodeURIComponent(icsContent)));
+      window.open(BASE_URL + "download.html#" + encoded, "_blank");
+
+      return t.set(
+        "card",
+        "private",
+        "calendarLastAdded",
+        new Date().toISOString(),
+      );
+    });
+  }
+
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
     /* ── Board button (top of board) ──────────────────────────── */
@@ -109,7 +131,20 @@
         return [];
       }
     },
+
+    /* ── Card sidebar button (reliable fallback) ─────────────── */
+    "card-buttons": function () {
+      return [
+        {
+          icon: BASE_URL + "img/icon-dark.svg",
+          text: "Sync this card to Apple Calendar",
+          callback: function (t) {
+            return openCardInCalendar(t);
+          },
+        },
+      ];
+    },
   });
 
-  console.log("[Power-Up] Initialized with board-buttons capability");
+  console.log("[Power-Up] Initialized with board-buttons and card-buttons");
 })();
