@@ -162,7 +162,7 @@
     var boardId = context.board || context.idBoard || "";
 
     return t
-      .card("id", "name", "due", "url")
+      .card("id", "name", "due")
       .then(function (card) {
         hide(elLoading);
 
@@ -227,7 +227,7 @@
 
   // ── Button handler (exposed globally for the inline onclick) ─
   window.addToCalendar = function () {
-    t.card("id", "name", "due", "url")
+    t.card("id", "name", "due")
       .then(function (card) {
         if (!card.due) return;
 

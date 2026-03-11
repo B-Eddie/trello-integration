@@ -84,7 +84,7 @@
   }
 
   function openCardInCalendar(t) {
-    return t.card("id", "name", "due", "url").then(function (card) {
+    return t.card("id", "name", "due").then(function (card) {
       if (!card.due) {
         return t.alert({
           message: "Add a due date first, then sync to Apple Calendar.",
