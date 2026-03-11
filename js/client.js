@@ -52,6 +52,19 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
+    /* ── Card back section (always available on card back) ───── */
+    "card-back-section": function (t) {
+      return {
+        title: "Apple Calendar Sync",
+        icon: ATTACHMENT_SECTION_ICON,
+        content: {
+          type: "iframe",
+          url: t.signUrl(BASE_URL + "section.html"),
+          height: 120,
+        },
+      };
+    },
+
     /* ── Board button (top of board) ──────────────────────────── */
     "board-buttons": function (t) {
       console.log("[Power-Up] board-buttons callback triggered");
