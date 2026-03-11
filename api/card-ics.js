@@ -55,11 +55,22 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    var key = process.env.TRELLO_API_KEY;
-    var token = process.env.TRELLO_API_TOKEN;
+    function cleanEnv(value) {
+      if (!value) return '';
+      return String(value).trim().replace(/^['\"]|['\"]$/g, '');
+    }
+
+    var key = cleanEnv(process.env.TRELLO_API_KEY || process.env.TRELLO_KEY);
+    var token = cleanEnv(process.env.TRELLO_API_TOKEN || process.env.TRELLO_TOKEN);
 
     if (!key || !token) {
-      res.status(500).send('Missing TRELLO_API_KEY or TRELLO_API_TOKEN env vars');
+      res.status(500).send('Missing env vars. Set TRELLO_API_KEY and TRELLO_API_TOKEN in Vercel, then redeploy.');
+      return;
+    }
+
+    // Basic sanity checks before calling Trello API.
+    if (!/^[a-f0-9]{32}$/i.test(key)) {
+      res.status(500).send('TRELLO_API_KEY format looks invalid. Expected a 32-char hex key.');
       return;
     }
 
@@ -77,6 +88,12 @@ module.exports = async function handler(req, res) {
     var response = await fetch(endpoint);
     if (!response.ok) {
       var body = await response.text();
+      if (response.status === 401) {
+        res.status(401).send(
+          'Trello auth failed (invalid key/token). Check Vercel env vars TRELLO_API_KEY and TRELLO_API_TOKEN, ensure no quotes/spaces, then redeploy.'
+        );
+        return;
+      }
       res.status(response.status).send('Trello API error: ' + body);
       return;
     }
