@@ -1,104 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Opening Apple Calendar…</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f4f5f7;
-      color: #172b4d;
-      text-align: center;
-      padding: 24px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 32px 40px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.12);
-      max-width: 380px;
-      width: 100%;
-    }
-    .icon { font-size: 48px; margin-bottom: 12px; }
-    h1 { font-size: 18px; margin: 0 0 8px; }
-    p  { font-size: 14px; color: #5e6c84; margin: 0 0 16px; line-height: 1.5; }
-    .step {
-      background: #f4f5f7;
-      border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #172b4d;
-      text-align: left;
-      margin-bottom: 8px;
-    }
-    .step b { color: #0079bf; }
-    .close-btn {
-      margin-top: 16px;
-      padding: 8px 20px;
-      background: #0079bf;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .close-btn:hover { background: #026aa7; }
-    .err { color: #c0392b; }
-  </style>
-</head>
-<body>
-  <div class="card" id="card">
-    <div class="icon">📅</div>
-    <h1>Opening Apple Calendar…</h1>
-    <p>Your calendar event is being prepared. Follow the steps below:</p>
-    <div class="step">1. The <b>.ics file</b> is downloading now.</div>
-    <div class="step">2. Click it in your browser's download bar, <b>or</b> find it in <b>Downloads</b>.</div>
-    <div class="step">3. macOS will open <b>Calendar.app</b> and ask you to confirm adding the event.</div>
-    <button class="close-btn" onclick="window.close()">Close this tab</button>
-  </div>
-
-  <script>
-    (function () {
-      var hash = window.location.hash.slice(1);
-
-      if (!hash) {
-        document.getElementById('card').innerHTML =
-          '<p class="err">No calendar data found. Please go back and try again.</p>';
-        return;
+  <head>
+    <meta charset="UTF-8" />
+    <title>Opening Apple Calendar…</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #f4f5f7;
+        color: #172b4d;
+        text-align: center;
+        padding: 24px;
       }
-
-      try {
-        // Decode base64 → UTF-8
-        var icsContent = decodeURIComponent(escape(atob(hash)));
-
-        // Extract card name for a friendly filename
-        var match = icsContent.match(/^SUMMARY:(.+)$/m);
-        var rawName = match ? match[1] : 'trello-event';
-        var filename = rawName.replace(/[^a-z0-9_\-\s]/gi, '').trim().replace(/\s+/g, '_') || 'trello-event';
-        filename += '.ics';
-
-        // Trigger download from this un-sandboxed page context
-        var blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-        var url  = URL.createObjectURL(blob);
-        var a    = document.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-
-      } catch (e) {
-        document.getElementById('card').innerHTML =
-          '<p class="err">Failed to generate the calendar file: ' + e.message + '</p>';
+      .card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 32px 40px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+        max-width: 380px;
+        width: 100%;
       }
-    }());
-  </script>
-</body>
+      .icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 8px;
+      }
+      p {
+        font-size: 14px;
+        color: #5e6c84;
+        margin: 0 0 16px;
+        line-height: 1.5;
+      }
+      .step {
+        background: #f4f5f7;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #172b4d;
+        text-align: left;
+        margin-bottom: 8px;
+      }
+      .step b {
+        color: #0079bf;
+      }
+      .close-btn {
+        margin-top: 16px;
+        padding: 8px 20px;
+        background: #0079bf;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .close-btn:hover {
+        background: #026aa7;
+      }
+      .err {
+        color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card" id="card">
+      <div class="icon">📅</div>
+      <h1>Opening Apple Calendar…</h1>
+      <p>Your calendar event is being prepared. Follow the steps below:</p>
+      <div class="step">1. The <b>.ics file</b> is downloading now.</div>
+      <div class="step">
+        2. Click it in your browser's download bar, <b>or</b> find it in
+        <b>Downloads</b>.
+      </div>
+      <div class="step">
+        3. macOS will open <b>Calendar.app</b> and ask you to confirm adding the
+        event.
+      </div>
+      <button class="close-btn" onclick="window.close()">Close this tab</button>
+    </div>
+
+    <script>
+      (function () {
+        var hash = window.location.hash.slice(1);
+
+        if (!hash) {
+          document.getElementById("card").innerHTML =
+            '<p class="err">No calendar data found. Please go back and try again.</p>';
+          return;
+        }
+
+        try {
+          // Decode base64 → UTF-8
+          var icsContent = decodeURIComponent(escape(atob(hash)));
+
+          // Extract card name for a friendly filename
+          var match = icsContent.match(/^SUMMARY:(.+)$/m);
+          var rawName = match ? match[1] : "trello-event";
+          var filename =
+            rawName
+              .replace(/[^a-z0-9_\-\s]/gi, "")
+              .trim()
+              .replace(/\s+/g, "_") || "trello-event";
+          filename += ".ics";
+
+          // Trigger download from this un-sandboxed page context
+          var blob = new Blob([icsContent], {
+            type: "text/calendar;charset=utf-8",
+          });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 2000);
+        } catch (e) {
+          document.getElementById("card").innerHTML =
+            '<p class="err">Failed to generate the calendar file: ' +
+            e.message +
+            "</p>";
+        }
+      })();
+    </script>
+  </body>
 </html>

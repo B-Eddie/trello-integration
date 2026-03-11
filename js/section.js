@@ -97,22 +97,26 @@
    * Encoding: btoa(unescape(encodeURIComponent(icsContent))) handles UTF-8
    * card names safely within a URL hash fragment.
    */
-  var BASE_URL = window.location.href.replace(/\/[^/]*$/, '/');
+  var BASE_URL = window.location.href.replace(/\/[^/]*$/, "/");
 
   function downloadICS(icsContent) {
     var encoded = btoa(unescape(encodeURIComponent(icsContent)));
-    var popup = window.open(BASE_URL + 'download.html#' + encoded, '_blank');
+    var popup = window.open(BASE_URL + "download.html#" + encoded, "_blank");
     // Fallback: if the popup was blocked, try a direct download from the iframe
     if (!popup || popup.closed) {
-      var blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-      var url  = URL.createObjectURL(blob);
-      var a    = document.createElement('a');
-      a.href     = url;
-      a.download = 'trello-event.ics';
+      var blob = new Blob([icsContent], {
+        type: "text/calendar;charset=utf-8",
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "trello-event.ics";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
     }
   }
 

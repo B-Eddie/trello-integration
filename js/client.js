@@ -9,7 +9,7 @@
   // Resolve an absolute URL for any page in this Power-Up.
   // Using absolute URLs with t.signUrl() is required — relative URLs are not
   // reliably resolved by the Trello SDK in all browser/iframe contexts.
-  var BASE_URL = window.location.href.replace(/\/[^/]*$/, '/');
+  var BASE_URL = window.location.href.replace(/\/[^/]*$/, "/");
   function absUrl(page) {
     return BASE_URL + page;
   }
@@ -37,7 +37,7 @@
           type: "iframe",
           // t.signUrl MUST receive an absolute URL so the JWT hash is
           // correctly embedded and TrelloPowerUp.iframe() can parse it.
-          url: t.signUrl(absUrl('section.html')),
+          url: t.signUrl(absUrl("section.html")),
           height: 88,
         },
       };
