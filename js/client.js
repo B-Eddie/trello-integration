@@ -7,9 +7,9 @@
   "use strict";
 
   // Resolve an absolute URL for any page in this Power-Up.
-  // Using absolute URLs with t.signUrl() is required — relative URLs are not
-  // reliably resolved by the Trello SDK in all browser/iframe contexts.
-  var BASE_URL = window.location.href.replace(/\/[^/]*$/, "/");
+  // Use origin + pathname (never href) so Trello's JWT hash fragment
+  // that is appended to index.html doesn't corrupt the base path.
+  var BASE_URL = (window.location.origin + window.location.pathname).replace(/\/[^/]*$/, "/");
   function absUrl(page) {
     return BASE_URL + page;
   }
