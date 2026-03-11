@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    var fields = "id,name,due,url,dateLastActivity";
+    var fields = "id,name,due,url,dateLastActivity,closed";
     var endpoint =
       "https://api.trello.com/1/boards/" +
       encodeURIComponent(boardId) +
@@ -127,7 +127,7 @@ module.exports = async function handler(req, res) {
 
     var cards = await response.json();
     var dueCards = cards.filter(function (c) {
-      return !!c.due;
+      return !!c.due && !c.closed;
     });
 
     var maxActivity = dueCards.reduce(function (maxTs, card) {
