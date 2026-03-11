@@ -129,11 +129,11 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---|---|
-| No "Sync to Apple Calendar" button | Make sure `board-buttons` capability is enabled in Power-Up settings. Reload the board. |
-| "This site can't be reached" | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel. |
-| Popup doesn't open | Check if your browser is blocking popups. Allow popups for Trello. |
-| .ics file doesn't open Calendar.app | Double-click the `.ics` file in Downloads manually. |
-| No cards appear in the sync popup | Make sure cards on the board have due dates set. |
-| Duplicate events in Calendar | Delete the old event; re-syncing will update the Calendar event via matching UID. |
+| Problem                             | Fix                                                                                     |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| No "Sync to Apple Calendar" button  | Make sure `board-buttons` capability is enabled in Power-Up settings. Reload the board. |
+| "This site can't be reached"        | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel.                   |
+| Popup doesn't open                  | Check if your browser is blocking popups. Allow popups for Trello.                      |
+| .ics file doesn't open Calendar.app | Double-click the `.ics` file in Downloads manually.                                     |
+| No cards appear in the sync popup   | Make sure cards on the board have due dates set.                                        |
+| Duplicate events in Calendar        | Delete the old event; re-syncing will update the Calendar event via matching UID.       |
