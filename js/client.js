@@ -9,7 +9,10 @@
   // Resolve an absolute URL for any page in this Power-Up.
   // Use origin + pathname (never href) so Trello's JWT hash fragment
   // that is appended to index.html doesn't corrupt the base path.
-  var BASE_URL = (window.location.origin + window.location.pathname).replace(/\/[^/]*$/, "/");
+  var BASE_URL = (window.location.origin + window.location.pathname).replace(
+    /\/[^/]*$/,
+    "/",
+  );
   function absUrl(page) {
     return BASE_URL + page;
   }

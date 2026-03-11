@@ -99,7 +99,10 @@
    */
   // Use origin + pathname (never href) so Trello's JWT hash fragment
   // doesn't corrupt the base path when section.html is loaded.
-  var BASE_URL = (window.location.origin + window.location.pathname).replace(/\/[^/]*$/, "/");
+  var BASE_URL = (window.location.origin + window.location.pathname).replace(
+    /\/[^/]*$/,
+    "/",
+  );
 
   function downloadICS(icsContent) {
     var encoded = btoa(unescape(encodeURIComponent(icsContent)));
