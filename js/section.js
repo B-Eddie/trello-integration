@@ -264,19 +264,22 @@
 
   window.copySubLink = function () {
     if (!elSubLink.value) return;
-    navigator.clipboard
-      .writeText(elSubLink.value)
-      .then(function () {
+    // navigator.clipboard is blocked by Trello iframe permissions policy.
+    // Use selection + execCommand, then fall back to manual Cmd/Ctrl+C.
+    elSubLink.focus();
+    elSubLink.select();
+    try {
+      var copied = document.execCommand("copy");
+      if (copied) {
         elCopyStatus.textContent =
           "Copied. In Apple Calendar: File -> New Calendar Subscription -> paste this URL once.";
-        show(elCopyStatus);
-        t.sizeTo("#app").catch(function () {});
-      })
-      .catch(function () {
-        elSubLink.select();
-        document.execCommand("copy");
-        elCopyStatus.textContent = "Copied.";
-        show(elCopyStatus);
-      });
+      } else {
+        elCopyStatus.textContent = "Press Cmd+C (or Ctrl+C) to copy this URL.";
+      }
+    } catch (e) {
+      elCopyStatus.textContent = "Press Cmd+C (or Ctrl+C) to copy this URL.";
+    }
+    show(elCopyStatus);
+    t.sizeTo("#app").catch(function () {});
   };
 })();
