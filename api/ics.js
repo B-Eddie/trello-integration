@@ -63,7 +63,7 @@ function buildCalendar(cards) {
       foldLine("URL:" + cardUrl),
       "SEQUENCE:" + sequence,
       "LAST-MODIFIED:" + toICSDate(activityDate),
-      card.closed ? "STATUS:CANCELLED" : "STATUS:CONFIRMED",
+      "STATUS:CONFIRMED",
       "END:VEVENT",
     );
   });
@@ -99,11 +99,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    var fields = "id,name,due,url,dateLastActivity,closed";
+    var fields = "id,name,due,url,dateLastActivity";
     var endpoint =
       "https://api.trello.com/1/boards/" +
       encodeURIComponent(boardId) +
-      "/cards?filter=all&fields=" +
+      "/cards?filter=open&fields=" +
       encodeURIComponent(fields) +
       "&key=" +
       encodeURIComponent(key) +
@@ -135,18 +135,9 @@ module.exports = async function handler(req, res) {
       return Math.max(maxTs, ts);
     }, 0);
 
-    var closedDueCount = dueCards.filter(function (card) {
-      return !!card.closed;
-    }).length;
-
     var etagSeed = dueCards
       .map(function (card) {
-        return [
-          card.id,
-          card.closed ? "1" : "0",
-          card.due || "",
-          card.dateLastActivity || "",
-        ].join(":");
+        return [card.id, card.due || "", card.dateLastActivity || ""].join(":");
       })
       .sort()
       .join("|");
@@ -156,8 +147,6 @@ module.exports = async function handler(req, res) {
       boardId +
       "-" +
       dueCards.length +
-      "-" +
-      closedDueCount +
       "-" +
       maxActivity +
       "-" +

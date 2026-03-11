@@ -17,9 +17,8 @@
   var elHasDue = document.getElementById("has-due");
   var elDueLabel = document.getElementById("due-date-label");
   var elCalendarFeedLink = document.getElementById("calendar-feed-link");
-  var elSubLink = document.getElementById("sub-link");
   var pollStarted = false;
-  var currentSubUrl = "";
+  var currentBoardId = "";
   var BASE_URL = (window.location.origin + window.location.pathname).replace(
     /\/[^/]*$/,
     "/",
@@ -39,19 +38,9 @@
 
   function renderState(card, boardId) {
     hide(elLoading);
+    currentBoardId = boardId || "";
 
-    if (boardId) {
-      var subUrl = buildSubscriptionUrl(boardId);
-      currentSubUrl = subUrl;
-      elSubLink.href = subUrl;
-      elSubLink.textContent = subUrl;
-      elCalendarFeedLink.disabled = false;
-    } else {
-      currentSubUrl = "";
-      elSubLink.removeAttribute("href");
-      elSubLink.textContent = "Board ID not available in this context.";
-      elCalendarFeedLink.disabled = true;
-    }
+    elCalendarFeedLink.disabled = !currentBoardId || !card.due;
 
     if (!card.due) {
       show(elNoDue);
@@ -117,7 +106,7 @@
   });
 
   window.forceRefreshFeed = function () {
-    if (!currentSubUrl) {
+    if (!currentBoardId) {
       return;
     }
 
@@ -125,8 +114,8 @@
     elCalendarFeedLink.disabled = true;
     elCalendarFeedLink.textContent = "Refreshing...";
 
-    var separator = currentSubUrl.indexOf("?") >= 0 ? "&" : "?";
-    var refreshUrl = currentSubUrl + separator + "refresh=" + Date.now();
+    var refreshUrl =
+      buildSubscriptionUrl(currentBoardId) + "&refresh=" + Date.now();
 
     fetch(refreshUrl, {
       cache: "no-store",

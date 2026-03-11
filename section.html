@@ -10,8 +10,8 @@
     <div id="app" class="section-container">
       <div id="no-due" class="state hidden">
         <p class="muted">
-          No due date set. Add a due date to this card to sync it with Apple
-          Calendar.
+          No due date set. Add a due date to this card for calendar sync to
+          work.
         </p>
       </div>
 
@@ -58,18 +58,9 @@
           </button>
         </div>
 
-        <div class="sub-link-wrap">
-          <p class="muted small">
-            Subscribe in Apple Calendar using this URL. It updates automatically
-            when due dates change or new due dates are added.
-          </p>
-          <a
-            id="sub-link"
-            class="sub-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          ></a>
-        </div>
+        <p class="muted small">
+          Use this after changing due dates to force an immediate feed rebuild.
+        </p>
       </div>
 
       <div id="loading" class="state">

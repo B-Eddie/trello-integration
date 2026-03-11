@@ -1,16 +1,5 @@
 /* =============================================================
    Trello → Apple Calendar Power-Up  |  client.js
-
-   Architecture note
-   -----------------
-   We intentionally do NOT use card-back-section (iframe type) because
-   that requires TrelloPowerUp.iframe() to relay postMessages through the
-   connector frame — which breaks with cross-origin mismatches.
-
-   Instead we use card-buttons: the callback runs directly inside the
-   connector frame where the Trello context (t) is always valid. We build
-   the ICS here and open download.html via window.open(), which is allowed
-   by Trello's sandbox (allow-popups).
    ============================================================= */
 
 (function () {
@@ -52,21 +41,17 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-    /* ── Card back section (shown when card has a due date) ───── */
+    /* ── Card back section (always shown) ─────────────────────── */
     "card-back-section": function (t) {
-      return t.card("due").then(function (card) {
-        if (!card.due) return null;
-
-        return {
-          title: "Apple Calendar Sync",
-          icon: SECTION_ICON,
-          content: {
-            type: "iframe",
-            url: t.signUrl(BASE_URL + "section.html"),
-            height: 120,
-          },
-        };
-      });
+      return {
+        title: "Apple Calendar Sync",
+        icon: SECTION_ICON,
+        content: {
+          type: "iframe",
+          url: t.signUrl(BASE_URL + "section.html"),
+          height: 120,
+        },
+      };
     },
 
     /* ── Board button (top of board) ──────────────────────────── */
