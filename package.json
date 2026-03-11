@@ -1,0 +1,12 @@
+{
+  "name": "trello-apple-calendar-powerup",
+  "version": "1.0.0",
+  "description": "Trello Power-Up that adds due-date cards to Apple Calendar via .ics download",
+  "scripts": {
+    "start": "npx serve . --listen 4000",
+    "tunnel": "npx ngrok http 4000"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}
