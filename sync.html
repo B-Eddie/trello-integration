@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sync Cards to Apple Calendar</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 0;
+      padding: 20px;
+      background: #f4f5f7;
+      color: #172b4d;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+    .info {
+      background: #f4f5f7;
+      border-left: 3px solid #0079bf;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 3px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .list {
+      border: 1px solid #e2e4e6;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+    .card-item {
+      padding: 12px;
+      border-bottom: 1px solid #e2e4e6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .card-item:last-child {
+      border-bottom: none;
+    }
+    .card-item input {
+      cursor: pointer;
+    }
+    .card-name {
+      flex: 1;
+      font-weight: 500;
+    }
+    .card-due {
+      color: #5e6c84;
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: #0079bf;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #026aa7;
+    }
+    .btn-secondary {
+      background: #e2e4e6;
+      color: #172b4d;
+    }
+    .btn-secondary:hover {
+      background: #d4d6dd;
+    }
+    .status {
+      text-align: center;
+      color: #5e6c84;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    .success {
+      color: #006244;
+      background: #e3fcef;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .error {
+      color: #ae2a19;
+      background: #fde7dc;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 Sync to Apple Calendar</h1>
+    <div class="info">
+      Select the cards you want to add to Apple Calendar. Each will download
+      as a separate .ics file.
+    </div>
+
+    <div id="loading" class="status">Loading your cards…</div>
+
+    <div id="config" style="display: none">
+      <div class="list" id="cardList"></div>
+
+      <div id="successMsg" class="success" style="display: none">
+        ✓ Cards downloaded! Check your Downloads folder and double-click each
+        .ics file to add them to Calendar.
+      </div>
+
+      <div id="errorMsg" class="error" style="display: none"></div>
+
+      <div class="actions">
+        <button class="btn-secondary" onclick="selectAll()">Select All</button>
+        <button class="btn-secondary" onclick="selectNone()">Select None</button>
+        <button class="btn-primary" onclick="syncSelected()">
+          Sync Selected to Calendar
+        </button>
+        <button class="btn-secondary" onclick="window.close()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var BASE_URL = (window.location.origin + window.location.pathname).replace(
+      /\/[^/]*$/,
+      "/"
+    );
+    var selectedCards = [];
+
+    // Helper functions (duplicated from client.js for simplicity)
+    function toICSDate(date) {
+      return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    }
+
+    function escapeICS(str) {
+      return String(str)
+        .replace(/\\/g, "\\\\")
+        .replace(/;/g, "\\;")
+        .replace(/,/g, "\\,")
+        .replace(/\n/g, "\\n");
+    }
+
+    function foldLine(line) {
+      if (line.length <= 75) return line;
+      var result = "";
+      while (line.length > 75) {
+        result += line.slice(0, 75) + "\r\n ";
+        line = line.slice(75);
+      }
+      return result + line;
+    }
+
+    function buildICS(card) {
+      var dueDate = new Date(card.due);
+      var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000);
+      var now = new Date();
+      return [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Trello Apple Calendar Power-Up//EN",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        "UID:" + card.id + "@trello-apple-calendar-powerup",
+        "DTSTAMP:" + toICSDate(now),
+        "DTSTART:" + toICSDate(dueDate),
+        "DTEND:" + toICSDate(endDate),
+        foldLine("SUMMARY:" + escapeICS(card.name)),
+        foldLine("DESCRIPTION:" + escapeICS("Trello card: " + card.shortUrl)),
+        foldLine("URL:" + card.shortUrl),
+        "SEQUENCE:0",
+        "LAST-MODIFIED:" + toICSDate(now),
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\r\n");
+    }
+
+    function downloadICS(icsContent, filename) {
+      var blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
+    }
+
+    // Load cards from Trello
+    window.onload = function () {
+      var t = window.opener.trelloPowerUpContext;
+      if (!t) {
+        document.getElementById("loading").textContent = "Error: No Trello context found.";
+        return;
+      }
+
+      t.board("cards")
+        .then(function (cards) {
+          var cardsWithDue = cards.filter(function (c) {
+            return c.due;
+          });
+
+          if (cardsWithDue.length === 0) {
+            document.getElementById("loading").textContent =
+              "No cards with due dates found on this board.";
+            return;
+          }
+
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("config").style.display = "block";
+
+          var list = document.getElementById("cardList");
+          cardsWithDue.forEach(function (card) {
+            var dueDate = new Date(card.due);
+            var item = document.createElement("div");
+            item.className = "card-item";
+            item.innerHTML =
+              '<input type="checkbox" id="card-' +
+              card.id +
+              '" value="' +
+              card.id +
+              '" onchange="toggleCard(this)" />' +
+              '<label for="card-' +
+              card.id +
+              '" style="flex: 1; cursor: pointer;">' +
+              '<div class="card-name">' +
+              card.name +
+              '</div>' +
+              '<div class="card-due">' +
+              dueDate.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }) +
+              "</div></label>";
+            list.appendChild(item);
+          });
+
+          selectedCards = cardsWithDue.map(function (c) {
+            return c;
+          });
+        })
+        .catch(function (err) {
+          document.getElementById("loading").textContent =
+            "Error loading cards: " + err.message;
+        });
+    };
+
+    function toggleCard(checkbox) {
+      // Just for UI; we'll collect selected on sync
+    }
+
+    function selectAll() {
+      document.querySelectorAll(".card-item input").forEach(function (cb) {
+        cb.checked = true;
+      });
+    }
+
+    function selectNone() {
+      document.querySelectorAll(".card-item input").forEach(function (cb) {
+        cb.checked = false;
+      });
+    }
+
+    function syncSelected() {
+      var selected = [];
+      document.querySelectorAll(".card-item input:checked").forEach(function (cb) {
+        var cardId = cb.value;
+        // Find the card data
+        var t = window.opener.trelloPowerUpContext;
+        t.board("cards")
+          .then(function (cards) {
+            var card = cards.find(function (c) {
+              return c.id === cardId;
+            });
+            if (card) {
+              var icsContent = buildICS(card);
+              var filename = card.name
+                .replace(/[^a-z0-9_\-\s]/gi, "")
+                .trim()
+                .replace(/\s+/g, "_");
+              filename = (filename || "trello-event") + ".ics";
+              downloadICS(icsContent, filename);
+            }
+          });
+      });
+
+      // Record board-level sync time
+      var t = window.opener.trelloPowerUpContext;
+      t.set("board", "private", "lastSyncTime", new Date().toISOString());
+
+      document.getElementById("successMsg").style.display = "block";
+      document.getElementById("config").style.display = "none";
+      document.getElementById("loading").style.display = "none";
+    }
+  </script>
+</body>
+</html>

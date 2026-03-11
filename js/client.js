@@ -89,57 +89,36 @@
 
   // ── Power-Up registration ─────────────────────────────────────
   TrelloPowerUp.initialize({
-    /* ── Card-detail badge (card back header) — clickable ────────── */
-    "card-detail-badges": function (t) {
-      return t
-        .card("due")
-        .then(function (card) {
-          if (!card.due) return [];
-          // Show clickable badge — data will be fetched fresh in the callback
-          return [
-            {
-              text: "→ Calendar",
-              icon: CALENDAR_ICON,
-              color: "green",
-              callback: function (t) {
-                // Fetch fresh card data when badge is clicked
-                return t
-                  .card("id", "name", "due", "shortUrl")
-                  .then(function (currentCard) {
-                    if (!currentCard.due) return;
-                    var icsContent = buildICS(currentCard);
-                    var encoded = btoa(
-                      unescape(encodeURIComponent(icsContent)),
-                    );
-                    window.open(
-                      BASE_URL + "download.html#" + encoded,
-                      "_blank",
-                    );
-                    // Record sync time
-                    return t.set(
-                      "card",
-                      "private",
-                      "calendarLastAdded",
-                      new Date().toISOString(),
-                    );
-                  });
-              },
-            },
-          ];
-        })
-        .catch(function (err) {
-          console.error("card-detail-badges error:", err);
-          return [];
-        });
+    /* ── Board button (top of board) ──────────────────────────── */
+    "board-buttons": function (t) {
+      return [
+        {
+          icon: CALENDAR_ICON,
+          text: "Sync to Apple Calendar",
+          callback: function () {
+            // Pass the board context to sync.html via window.open
+            // The page will handle fetching all cards and syncing them
+            // Store the Trello context so sync.html can access it
+            window.trelloPowerUpContext = t;
+            window.open(BASE_URL + "sync.html", "sync", "width=700,height=600");
+          },
+        },
+      ];
     },
 
-    /* ── Card badge (compact, shown on the board) ─────────────── */
-    "card-badges": function (t) {
+    /* ── Board badge (shown in board header) ────────────────── */
+    "board-badges": function (t) {
       return t
-        .get("card", "private", "calendarLastAdded")
-        .then(function (lastAdded) {
-          if (!lastAdded) return [];
-          return [{ icon: CALENDAR_ICON, text: "In Calendar", color: "green" }];
+        .get("board", "private", "lastSyncTime")
+        .then(function (lastSync) {
+          if (!lastSync) return [];
+          return [
+            {
+              text: "Last sync: " + new Date(lastSync).toLocaleDateString(),
+              icon: CALENDAR_ICON,
+              color: "blue",
+            },
+          ];
         });
     },
   });

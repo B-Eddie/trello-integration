@@ -1,16 +1,17 @@
 # Trello → Apple Calendar Power-Up
 
-A Trello Power-Up that syncs cards with Apple Calendar. When a Trello card has a due date, an **"Apple Calendar"** section appears on the card back. Clicking **"Add to Apple Calendar"** downloads an `.ics` file that macOS automatically opens in Calendar.app — no credentials or API keys required.
+A Trello Power-Up that syncs cards with Apple Calendar. Click the **"Sync to Apple Calendar"** button at the top of your board, select which cards you want, and all `.ics` files download automatically — no credentials or API keys required.
 
 ---
 
 ## How it works
 
-1. Open any Trello card that has a due date.
-2. A green **"Sync to Calendar"** badge appears at the top of the card (under the title).
-3. Click the badge → a new tab opens with your `.ics` file.
-4. macOS downloads the file and Calendar.app opens it, prompting you to add the event.
-5. Done — the event is now in your Apple Calendar.
+1. Open your Trello board.
+2. Click the **"Sync to Apple Calendar"** button at the top of the board (in the header).
+3. A popup window opens showing all cards with due dates.
+4. Select which cards you want to sync (or **Select All**).
+5. Click **"Sync Selected to Calendar"** → all .ics files download automatically.
+6. Double-click each .ics file in your Downloads folder → Calendar.app adds the events.
 
 Re-exporting the same card (e.g. after a due-date change) updates the existing Calendar event because the `.ics` UID is tied to the Trello card ID.
 
@@ -21,10 +22,10 @@ Re-exporting the same card (e.g. after a due-date change) updates the existing C
 ```
 trello-integration/
 ├── index.html      ← Power-Up connector (Trello's entry point)
-├── section.html    ← Card-back section UI
+├── sync.html       ← Board sync UI (popup window)
+├── download.html   ← ICS file trigger & instructions
 ├── js/
-│   ├── client.js   ← Registers Power-Up capabilities
-│   └── section.js  ← ICS generation & download logic
+│   └── client.js   ← Registers Power-Up capabilities
 ├── css/
 │   └── style.css   ← Styles
 └── package.json    ← Dev server config
@@ -102,9 +103,8 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
    - **Workspace**: choose your workspace
    - **Connector URL**: paste the URL from Step 2 (e.g. `https://…/index.html`)
 4. Under **Capabilities**, enable:
-   - `card-back-section`
-   - `card-detail-badges`
-   - `card-badges`
+   - `board-buttons`
+   - `board-badges`
 5. Click **Save**.
 
 ---
@@ -120,20 +120,21 @@ Your connector URL will be: `https://xxxx.ngrok.io/index.html`
 
 ### Step 5 — Test it
 
-1. Open any card on the board.
-2. Set a due date (click **Due Date** in the card sidebar).
-3. Close and reopen the card — you should see an **Apple Calendar** section.
-4. Click **"Add to Apple Calendar"**.
-5. macOS will prompt you to add the event to Calendar.app. Click **OK**.
+1. Refresh the board — you should see **"Sync to Apple Calendar"** button at the top in the board header.
+2. Click the button → a popup opens showing all cards with due dates.
+3. Select the cards you want to sync (or **Select All**).
+4. Click **"Sync Selected to Calendar"** → .ics files download.
+5. In your Downloads folder, double-click each `.ics` file → Calendar.app prompts you to add the event. Click **OK**.
 
 ---
 
 ## Troubleshooting
 
-| Problem                              | Fix                                                                           |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| Section doesn't appear               | Make sure the card has a due date set. Reload the board.                      |
-| "This site can't be reached"         | The Power-Up URL must be HTTPS. Use GitHub Pages or Netlify.                  |
-| Calendar doesn't open after download | Check your Downloads folder for the `.ics` file and double-click it manually. |
-| Badge doesn't update                 | Reload the page — Trello caches badges for a few seconds.                     |
-| Duplicate events in Calendar         | Delete the old event; re-importing will update via matching UID.              |
+| Problem | Fix |
+|---|---|
+| No "Sync to Apple Calendar" button | Make sure `board-buttons` capability is enabled in Power-Up settings. Reload the board. |
+| "This site can't be reached" | The Power-Up URL must be HTTPS. Use GitHub Pages, Netlify, or Vercel. |
+| Popup doesn't open | Check if your browser is blocking popups. Allow popups for Trello. |
+| .ics file doesn't open Calendar.app | Double-click the `.ics` file in Downloads manually. |
+| No cards appear in the sync popup | Make sure cards on the board have due dates set. |
+| Duplicate events in Calendar | Delete the old event; re-syncing will update the Calendar event via matching UID. |
