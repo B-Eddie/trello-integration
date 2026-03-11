@@ -130,48 +130,60 @@
 
   // ── Main logic ─────────────────────────────────────────────
   t.render(function () {
-    return t.card("id", "name", "due", "shortUrl").then(function (card) {
-      hide(elLoading);
+    return t
+      .card("id", "name", "due", "shortUrl")
+      .then(function (card) {
+        hide(elLoading);
 
-      if (!card.due) {
-        show(elNoDue);
-        hide(elHasDue);
-        t.sizeTo("#app").catch(function () {});
-        return;
-      }
-
-      // Format the due date for display
-      var dueDate = new Date(card.due);
-      elDueLabel.textContent = dueDate.toLocaleString(undefined, {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
-
-      show(elHasDue);
-      hide(elNoDue);
-
-      // Check if we've already exported this card
-      return t
-        .get("card", "private", "calendarLastAdded")
-        .then(function (lastAdded) {
-          if (lastAdded) {
-            var when = new Date(lastAdded);
-            elLastText.textContent =
-              "Last exported " +
-              when.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              });
-            show(elLastText);
-          }
+        if (!card.due) {
+          show(elNoDue);
+          hide(elHasDue);
           t.sizeTo("#app").catch(function () {});
+          return;
+        }
+
+        // Format the due date for display
+        var dueDate = new Date(card.due);
+        elDueLabel.textContent = dueDate.toLocaleString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
         });
-    });
+
+        show(elHasDue);
+        hide(elNoDue);
+
+        // Check if we've already exported this card
+        return t
+          .get("card", "private", "calendarLastAdded")
+          .then(function (lastAdded) {
+            if (lastAdded) {
+              var when = new Date(lastAdded);
+              elLastText.textContent =
+                "Last exported " +
+                when.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                });
+              show(elLastText);
+            }
+            t.sizeTo("#app").catch(function () {});
+          });
+      })
+      .catch(function (err) {
+        // If card context is unavailable (e.g. JWT expired, iframe not yet
+        // connected), fall back gracefully rather than staying stuck on "Loading".
+        console.error("[Apple Calendar Power-Up] render error:", err);
+        hide(elLoading);
+        show(elNoDue);
+        elNoDue.querySelector("p").textContent =
+          "Couldn't load card data. Please close and reopen the card.";
+        t.sizeTo("#app").catch(function () {});
+      });
   });
 
   // ── Button handler (exposed globally for the inline onclick) ─
