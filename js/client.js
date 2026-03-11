@@ -91,19 +91,26 @@
   TrelloPowerUp.initialize({
     /* ── Board button (top of board) ──────────────────────────── */
     "board-buttons": function (t) {
-      return [
-        {
-          icon: CALENDAR_ICON,
-          text: "Sync to Apple Calendar",
-          callback: function () {
-            // Pass the board context to sync.html via window.open
-            // The page will handle fetching all cards and syncing them
-            // Store the Trello context so sync.html can access it
-            window.trelloPowerUpContext = t;
-            window.open(BASE_URL + "sync.html", "sync", "width=700,height=600");
+      console.log("[Power-Up] board-buttons callback triggered");
+      try {
+        return [
+          {
+            icon: CALENDAR_ICON,
+            text: "Sync to Apple Calendar",
+            callback: function () {
+              console.log("[Power-Up] button clicked");
+              // Pass the board context to sync.html via window.open
+              window.trelloPowerUpContext = t;
+              window.open(BASE_URL + "sync.html", "sync", "width=700,height=600");
+            },
           },
-        },
-      ];
+        ];
+      } catch (err) {
+        console.error("[Power-Up] Error in board-buttons:", err);
+        return [];
+      }
     },
   });
+
+  console.log("[Power-Up] Initialized with board-buttons capability");
 })();
