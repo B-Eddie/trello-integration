@@ -91,40 +91,29 @@
   TrelloPowerUp.initialize({
     /* ── Sidebar button on the card back ─────────────────────── */
     "card-buttons": function (t) {
-      return t.card("due").then(function (card) {
-        return [
-          {
-            icon: CALENDAR_ICON,
-            text: card.due ? "Open in Apple Calendar" : "Add due date to sync",
-            callback: function (t) {
-              return t
-                .card("id", "name", "due", "shortUrl")
-                .then(function (card) {
-                  if (!card.due) {
-                    return t.alert({
-                      message:
-                        "This card has no due date. Add one first, then try again.",
-                      duration: 6,
-                    });
-                  }
-                  var icsContent = buildICS(card);
-                  var encoded = btoa(unescape(encodeURIComponent(icsContent)));
-                  // Open download.html in a new tab (allowed by Trello's
-                  // allow-popups sandbox). That page triggers the .ics
-                  // download so macOS opens Calendar.app — no iframe relay needed.
-                  window.open(BASE_URL + "download.html#" + encoded, "_blank");
-                  // Record the export time so badges update.
-                  return t.set(
-                    "card",
-                    "private",
-                    "calendarLastAdded",
-                    new Date().toISOString(),
-                  );
-                });
-            },
+      return [
+        {
+          icon: CALENDAR_ICON,
+          text: "→ Apple Calendar",
+          callback: function () {
+            t.card("id", "name", "due", "shortUrl")
+              .then(function (card) {
+                if (!card.due) {
+                  alert("This card has no due date. Add one first, then try again.");
+                  return;
+                }
+                var icsContent = buildICS(card);
+                var encoded = btoa(unescape(encodeURIComponent(icsContent)));
+                window.open(BASE_URL + "download.html#" + encoded, "_blank");
+                t.set("card", "private", "calendarLastAdded", new Date().toISOString());
+              })
+              .catch(function (err) {
+                console.error("Error:", err);
+                alert("Error: " + err.message);
+              });
           },
-        ];
-      });
+        },
+      ];
     },
 
     /* ── Card-detail badge (card back header) ─────────────────── */
