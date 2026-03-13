@@ -23,6 +23,17 @@ function foldLine(line) {
   return result + line;
 }
 
+function buildEventDescription(card) {
+  var parts = [];
+  var desc = String(card.desc || "").trim();
+  var cardUrl = String(card.url || "").trim();
+
+  if (desc) parts.push(desc);
+  if (cardUrl) parts.push("Trello card: " + cardUrl);
+
+  return parts.join("\n\n");
+}
+
 function buildICS(card) {
   var dueDate = new Date(card.due);
   var endDate = new Date(dueDate.getTime() + 60 * 60 * 1000);
@@ -41,7 +52,7 @@ function buildICS(card) {
     "DTSTART:" + toICSDate(dueDate),
     "DTEND:" + toICSDate(endDate),
     foldLine("SUMMARY:" + escapeICS(card.name)),
-    foldLine("DESCRIPTION:" + escapeICS("Trello card: " + cardUrl)),
+    foldLine("DESCRIPTION:" + escapeICS(buildEventDescription(card))),
     foldLine("URL:" + cardUrl),
     "SEQUENCE:0",
     "LAST-MODIFIED:" + toICSDate(now),
@@ -89,7 +100,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    var fields = "id,name,due,url,dateLastActivity";
+    var fields = "id,name,desc,due,url,dateLastActivity";
     var endpoint =
       "https://api.trello.com/1/cards/" +
       encodeURIComponent(cardId) +
